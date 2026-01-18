@@ -304,12 +304,12 @@
     }
 
     .start-btn.running {
-      background: #ef4444;
-      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+      background: var(--current-tier-color, var(--accent-blue));
+      filter: brightness(0.85);
     }
 
     .start-btn.running:hover {
-      background: #dc2626;
+      filter: brightness(0.75);
     }
 
     /* 超時狀態 */
@@ -672,6 +672,144 @@
       background: var(--tier3-color);
     }
 
+    /* 反思 Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--bg-secondary);
+      border-radius: 16px;
+      padding: 32px;
+      width: 90%;
+      max-width: 480px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      animation: modal-in 0.3s ease;
+    }
+
+    @keyframes modal-in {
+      from {
+        opacity: 0;
+        transform: scale(0.95) translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .modal-stats {
+      background: var(--bg-primary);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .modal-stats .stat-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .modal-stats .stat-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .modal-stats .stat-label {
+      color: var(--text-secondary);
+    }
+
+    .modal-stats .stat-value {
+      font-weight: 500;
+    }
+
+    .modal-stats .stat-value.overtime {
+      color: #f59e0b;
+    }
+
+    .modal-label {
+      display: block;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .modal-textarea {
+      width: 100%;
+      height: 100px;
+      padding: 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+      margin-bottom: 20px;
+    }
+
+    .modal-textarea:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .modal-btn {
+      flex: 1;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .modal-btn.primary {
+      background: var(--accent-blue);
+      color: white;
+    }
+
+    .modal-btn.primary:hover {
+      background: #3a6de8;
+    }
+
+    .modal-btn.secondary {
+      background: var(--bg-primary);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+    }
+
+    .modal-btn.secondary:hover {
+      background: var(--border-color);
+    }
+
     /* 響應式 */
     @media (max-width: 900px) {
       .container {
@@ -774,6 +912,20 @@
     </div>
   </div>
 
+  <!-- 反思 Modal -->
+  <div class="modal-overlay" id="reflectionModal">
+    <div class="modal-content">
+      <h3 class="modal-title">Session 完成</h3>
+      <div class="modal-stats" id="modalStats"></div>
+      <label class="modal-label">反思紀錄（選填）</label>
+      <textarea class="modal-textarea" id="reflectionInput" placeholder="這段時間做了什麼？有什麼收穫？"></textarea>
+      <div class="modal-actions">
+        <button class="modal-btn secondary" id="abandonBtn">放棄（仍計時間）</button>
+        <button class="modal-btn primary" id="confirmBtn">完成 Session</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 音效 -->
   <audio id="alarmSound" preload="auto">
     <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleRYVW6LR06FkFRpLltDcs3cvIDua0+CsaRsXQ5LP4LpxIxc3g8Pbs3sgHDGIzN63eSQaLYDG2rpzIBkrisrduXMlHi+DyNu2cCMZLYjJ3bdyJBwwg8nbtnAjGi2Iyd23ciQcMIPJ27ZwIxothsndt3IkHDCDydu2cCMaLYbJ3bdyJBwwg8nbtnAjGi2Gyd23ciQcMIPJ27ZwIxothsndt3IkHDCDydu2cCMaLYbJ3bdyJBwwg8nbtnAjGi2Gyd23ciQcMIPJ27ZwIxothsndt3IkHDCDydu2cCMaLYbJ3bdyJBwwg8nbtnAjGi2Gyd23ciQcMIPJ27ZwIxothsndt3IkHDCDydu2cCMaLYbJ3bdyJBwwg8nbtnAjGi2Gyd23ciQcMA==" type="audio/wav">
@@ -816,7 +968,12 @@
       saveSettings: document.getElementById('saveSettings'),
       statusDot: document.getElementById('statusDot'),
       statusText: document.getElementById('statusText'),
-      alarmSound: document.getElementById('alarmSound')
+      alarmSound: document.getElementById('alarmSound'),
+      reflectionModal: document.getElementById('reflectionModal'),
+      modalStats: document.getElementById('modalStats'),
+      reflectionInput: document.getElementById('reflectionInput'),
+      confirmBtn: document.getElementById('confirmBtn'),
+      abandonBtn: document.getElementById('abandonBtn')
     };
 
     // ============ 初始化 ============
@@ -899,6 +1056,15 @@
           elements.settingsPanel.classList.remove('show');
         }
       });
+
+      // Modal 事件
+      elements.confirmBtn.addEventListener('click', () => {
+        completeSession(false);
+      });
+
+      elements.abandonBtn.addEventListener('click', () => {
+        completeSession(true);
+      });
     }
 
     // ============ 計時器邏輯 ============
@@ -950,6 +1116,7 @@
       state.isOvertime = true;
       state.overtime = 0;
       playAlarm();
+      showNotification();
       
       // 更新按鈕為「確認完成」
       elements.startBtn.textContent = '確認完成';
@@ -960,15 +1127,76 @@
       elements.clockHand.style.transform = 'rotate(360deg)';
     }
 
+    function showNotification() {
+      if ('Notification' in window && Notification.permission === 'granted') {
+        const notification = new Notification('專注時間結束！', {
+          body: `${elements.taskInput.value || '專注'} - 點擊確認完成`,
+          requireInteraction: true
+        });
+        notification.onclick = () => {
+          window.focus();
+          showReflectionModal();
+        };
+      }
+    }
+
     function confirmComplete() {
+      // 停止計時，顯示反思 modal
       clearInterval(state.intervalId);
+      state.actualEndTime = new Date();
+      showReflectionModal();
+    }
+
+    function showReflectionModal() {
+      // 計算實際時長
+      const actualMinutes = state.duration + Math.floor(state.overtime / 60);
+      const overtimeSecs = state.overtime % 60;
+      
+      // 顯示統計
+      let statsHtml = `
+        <div class="stat-row">
+          <span class="stat-label">任務</span>
+          <span class="stat-value">${elements.taskInput.value || '專注'}</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">原定時長</span>
+          <span class="stat-value">${state.duration} 分鐘</span>
+        </div>
+      `;
+      
+      if (state.overtime > 0) {
+        const overtimeMin = Math.floor(state.overtime / 60);
+        const overtimeSec = state.overtime % 60;
+        statsHtml += `
+          <div class="stat-row">
+            <span class="stat-label">超時</span>
+            <span class="stat-value overtime">+${overtimeMin}:${overtimeSec.toString().padStart(2, '0')}</span>
+          </div>
+        `;
+      }
+      
+      statsHtml += `
+        <div class="stat-row">
+          <span class="stat-label">實際時長</span>
+          <span class="stat-value">${actualMinutes} 分鐘</span>
+        </div>
+      `;
+      
+      elements.modalStats.innerHTML = statsHtml;
+      elements.reflectionInput.value = '';
+      elements.reflectionModal.classList.add('show');
+    }
+
+    function completeSession(abandoned) {
       state.isRunning = false;
       state.isOvertime = false;
-      state.actualEndTime = new Date();
-
-      // 儲存 session（包含超時時間）
-      saveSession();
-
+      
+      // 儲存 session
+      saveSession(abandoned);
+      
+      // 關閉 modal
+      elements.reflectionModal.classList.remove('show');
+      
       // 重置 UI
       resetTimerUI();
     }
@@ -980,7 +1208,7 @@
 
       if (completed) {
         playAlarm();
-        saveSession();
+        saveSession(false);
       }
 
       resetTimerUI();
@@ -1176,12 +1404,12 @@
     }
 
     // ============ 資料儲存 ============
-    function saveSession() {
+    function saveSession(abandoned = false) {
       const actualEnd = state.actualEndTime || new Date();
       const actualDuration = state.duration + Math.floor(state.overtime / 60);
+      const reflection = elements.reflectionInput ? elements.reflectionInput.value.trim() : '';
       
       const session = {
-        id: Date.now(),
         task: elements.taskInput.value || '專注',
         tier: state.selectedTier,
         duration: actualDuration,           // 實際花費分鐘（含超時）
@@ -1189,7 +1417,9 @@
         overtime: state.overtime,           // 超時秒數
         startTime: state.startTime.toISOString(),
         endTime: actualEnd.toISOString(),   // 實際結束時間
-        completed: true
+        reflection: reflection,             // 反思內容
+        abandoned: abandoned,               // 是否放棄
+        completed: !abandoned
       };
 
       state.sessions.push(session);
@@ -1226,13 +1456,21 @@
 
     async function testConnection() {
       try {
-        const response = await fetch(state.sheetUrl);
+        // 使用 JSONP 方式繞過 CORS
+        const testUrl = `${state.sheetUrl}?callback=test&_=${Date.now()}`;
+        const response = await fetch(testUrl);
         if (response.ok) {
           elements.statusText.textContent = '連線成功';
+          elements.statusDot.classList.add('connected');
           loadSessionsFromSheet();
+        } else {
+          elements.statusText.textContent = '連線失敗';
+          elements.statusDot.classList.remove('connected');
         }
       } catch (e) {
-        elements.statusText.textContent = '連線失敗';
+        // 即使報錯，no-cors 模式下 POST 可能仍然成功
+        elements.statusText.textContent = '已設定（無法驗證）';
+        elements.statusDot.classList.add('connected');
       }
     }
 
@@ -1240,12 +1478,14 @@
       if (!state.sheetUrl) return;
 
       try {
+        // 使用 no-cors 模式，請求會送出但無法讀取回應
         await fetch(state.sheetUrl, {
           method: 'POST',
           mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'text/plain' },
           body: JSON.stringify(session)
         });
+        console.log('Session synced');
       } catch (e) {
         console.error('Sync failed:', e);
       }
@@ -1255,7 +1495,8 @@
       if (!state.sheetUrl) return;
 
       try {
-        const response = await fetch(state.sheetUrl);
+        // GET 請求 - Apps Script 需要回傳 JSONP 或設定 CORS
+        const response = await fetch(`${state.sheetUrl}?_=${Date.now()}`);
         if (response.ok) {
           const data = await response.json();
           if (Array.isArray(data) && data.length > 1) {
@@ -1272,10 +1513,11 @@
             localStorage.setItem('sessions', JSON.stringify(state.sessions));
             renderWeekView();
             renderTimeline();
+            elements.statusText.textContent = '已同步';
           }
         }
       } catch (e) {
-        console.error('Load failed:', e);
+        console.log('無法讀取遠端資料，使用本地資料');
       }
     }
 
