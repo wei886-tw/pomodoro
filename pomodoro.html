@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>專注時鐘</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #f8f9fa;
+      --bg-secondary: #ffffff;
+      --text-primary: #1a1a2e;
+      --text-secondary: #6b7280;
+      --accent-blue: #4a7dfc;
+      --accent-blue-light: #e8efff;
+      --tier1-color: #ef4444;
+      --tier2-color: #4a7dfc;
+      --tier3-color: #22c55e;
+      --border-color: #e5e7eb;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    .container {
+      display: flex;
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* 左側面板 - 計時器 */
+    .timer-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border-color);
+      min-height: 100vh;
+    }
+
+    .panel-title {
+      font-size: 1.25rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 24px;
+    }
+
+    /* Tier 選擇器 */
+    .tier-selector {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .tier-btn {
+      padding: 6px 16px;
+      border: 2px solid var(--border-color);
+      border-radius: 20px;
+      background: transparent;
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tier-btn[data-tier="1"] { color: var(--tier1-color); }
+    .tier-btn[data-tier="2"] { color: var(--tier2-color); }
+    .tier-btn[data-tier="3"] { color: var(--tier3-color); }
+
+    .tier-btn.active[data-tier="1"] {
+      background: var(--tier1-color);
+      border-color: var(--tier1-color);
+      color: white;
+    }
+    .tier-btn.active[data-tier="2"] {
+      background: var(--tier2-color);
+      border-color: var(--tier2-color);
+      color: white;
+    }
+    .tier-btn.active[data-tier="3"] {
+      background: var(--tier3-color);
+      border-color: var(--tier3-color);
+      color: white;
+    }
+
+    /* 任務輸入 */
+    .task-input {
+      width: 100%;
+      max-width: 320px;
+      padding: 12px 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 1rem;
+      margin-bottom: 40px;
+      text-align: center;
+      transition: border-color 0.2s;
+    }
+
+    .task-input:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+    }
+
+    .task-input::placeholder {
+      color: var(--text-secondary);
+    }
+
+    /* 類比時鐘 */
+    .clock-container {
+      position: relative;
+      width: 280px;
+      height: 280px;
+      margin-bottom: 24px;
+    }
+
+    .clock-face {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: var(--bg-secondary);
+      box-shadow: var(--shadow-md), inset 0 0 30px rgba(0,0,0,0.03);
+      position: relative;
+    }
+
+    .clock-marks {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+    }
+
+    .clock-mark {
+      position: absolute;
+      width: 2px;
+      height: 12px;
+      background: var(--border-color);
+      left: 50%;
+      top: 8px;
+      transform-origin: center 132px;
+      margin-left: -1px;
+    }
+
+    .clock-mark.major {
+      height: 16px;
+      width: 3px;
+      background: var(--text-secondary);
+      margin-left: -1.5px;
+    }
+
+    /* 指針 */
+    .clock-hand {
+      position: absolute;
+      width: 4px;
+      height: 90px;
+      background: var(--current-tier-color, var(--accent-blue));
+      left: 50%;
+      bottom: 50%;
+      transform-origin: bottom center;
+      margin-left: -2px;
+      border-radius: 2px;
+      transition: transform 0.5s ease, background 0.3s ease;
+      box-shadow: 0 2px 8px rgba(74, 125, 252, 0.3);
+    }
+
+    .clock-center {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      background: var(--current-tier-color, var(--accent-blue));
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 2px 8px rgba(74, 125, 252, 0.4);
+      transition: background 0.3s ease;
+    }
+
+    /* Tier 色彩主題 */
+    .clock-container.tier-1 {
+      --current-tier-color: var(--tier1-color);
+    }
+    .clock-container.tier-2 {
+      --current-tier-color: var(--tier2-color);
+    }
+    .clock-container.tier-3 {
+      --current-tier-color: var(--tier3-color);
+    }
+
+    .clock-container.tier-1 .clock-hand,
+    .clock-container.tier-1 .clock-center {
+      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+    }
+    .clock-container.tier-2 .clock-hand,
+    .clock-container.tier-2 .clock-center {
+      box-shadow: 0 2px 8px rgba(74, 125, 252, 0.4);
+    }
+    .clock-container.tier-3 .clock-hand,
+    .clock-container.tier-3 .clock-center {
+      box-shadow: 0 2px 8px rgba(34, 197, 94, 0.4);
+    }
+
+    /* 時間顯示 */
+    .time-display {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2.5rem;
+      font-weight: 500;
+      color: var(--current-tier-color, var(--accent-blue));
+      margin-bottom: 8px;
+      transition: color 0.3s ease;
+    }
+
+    .time-range {
+      font-size: 0.9rem;
+      color: var(--current-tier-color, var(--accent-blue));
+      padding: 6px 16px;
+      background: var(--bg-primary);
+      border-radius: 20px;
+      margin-bottom: 32px;
+      transition: color 0.3s ease;
+    }
+
+    /* 讓 timer-panel 也能接收 tier class */
+    .timer-panel.tier-1 { --current-tier-color: var(--tier1-color); }
+    .timer-panel.tier-2 { --current-tier-color: var(--tier2-color); }
+    .timer-panel.tier-3 { --current-tier-color: var(--tier3-color); }
+
+    /* 時間選擇器 */
+    .duration-selector {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .duration-btn {
+      padding: 8px 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background: transparent;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: var(--text-primary);
+    }
+
+    .duration-btn:hover {
+      border-color: var(--current-tier-color, var(--accent-blue));
+      color: var(--current-tier-color, var(--accent-blue));
+    }
+
+    .duration-btn.active {
+      background: var(--current-tier-color, var(--accent-blue));
+      border-color: var(--current-tier-color, var(--accent-blue));
+      color: white;
+    }
+
+    /* 開始按鈕 */
+    .start-btn {
+      width: 100%;
+      max-width: 320px;
+      padding: 16px 32px;
+      background: var(--current-tier-color, var(--accent-blue));
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px color-mix(in srgb, var(--current-tier-color, var(--accent-blue)) 40%, transparent);
+    }
+
+    .start-btn:hover {
+      filter: brightness(0.9);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px color-mix(in srgb, var(--current-tier-color, var(--accent-blue)) 50%, transparent);
+    }
+
+    .start-btn:active {
+      transform: translateY(0);
+    }
+
+    .start-btn.running {
+      background: #ef4444;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    .start-btn.running:hover {
+      background: #dc2626;
+    }
+
+    /* 超時狀態 */
+    .start-btn.overtime {
+      background: #f59e0b;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+      animation: pulse-overtime 1.5s ease-in-out infinite;
+    }
+
+    .start-btn.overtime:hover {
+      background: #d97706;
+    }
+
+    @keyframes pulse-overtime {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+    }
+
+    .time-display.overtime {
+      color: #f59e0b !important;
+      animation: blink-overtime 1s ease-in-out infinite;
+    }
+
+    @keyframes blink-overtime {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    /* 右側面板 - 時間軸 */
+    .timeline-panel {
+      flex: 1;
+      padding: 24px;
+      background: var(--bg-primary);
+      min-height: 100vh;
+      overflow-y: auto;
+    }
+
+    /* 週曆導覽 */
+    .calendar-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .nav-btn {
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background: var(--bg-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover {
+      border-color: var(--accent-blue);
+    }
+
+    .today-btn {
+      padding: 8px 24px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background: var(--bg-secondary);
+      font-family: inherit;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .today-btn:hover {
+      border-color: var(--accent-blue);
+    }
+
+    /* 週視圖 */
+    .week-view {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .day-column {
+      text-align: center;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      min-width: 60px;
+    }
+
+    .day-column:hover {
+      background: var(--bg-secondary);
+    }
+
+    .day-column.active {
+      background: var(--accent-blue);
+      color: white;
+    }
+
+    .day-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .day-column.active .day-label {
+      color: rgba(255,255,255,0.8);
+    }
+
+    .day-number {
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .day-hours {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+    }
+
+    .day-column.active .day-hours {
+      color: rgba(255,255,255,0.8);
+    }
+
+    /* 統計摘要 */
+    .stats-summary {
+      text-align: center;
+      margin-bottom: 24px;
+      padding: 16px;
+      background: var(--bg-secondary);
+      border-radius: 12px;
+    }
+
+    .stats-text {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .stats-text strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    /* 時間軸 */
+    .timeline {
+      position: relative;
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      padding: 0 16px;
+    }
+
+    .time-slot {
+      display: flex;
+      align-items: flex-start;
+      height: 60px;
+      border-bottom: 1px solid var(--border-color);
+      position: relative;
+    }
+
+    .time-label {
+      width: 50px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      padding-top: 4px;
+      flex-shrink: 0;
+    }
+
+    .slot-content {
+      flex: 1;
+      height: 100%;
+      position: relative;
+    }
+
+    /* 專注區塊 */
+    .focus-block {
+      position: absolute;
+      left: 0;
+      right: 8px;
+      background: var(--accent-blue);
+      border-radius: 6px;
+      padding: 8px 12px;
+      color: white;
+      font-size: 0.8rem;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .focus-block[data-tier="1"] { background: var(--tier1-color); }
+    .focus-block[data-tier="2"] { background: var(--tier2-color); }
+    .focus-block[data-tier="3"] { background: var(--tier3-color); }
+
+    .focus-block .block-time {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      opacity: 0.9;
+      margin-bottom: 2px;
+    }
+
+    .focus-block .block-title {
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .focus-block .block-tier {
+      font-size: 0.7rem;
+      opacity: 0.9;
+    }
+
+    .focus-block .block-duration {
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      opacity: 0.9;
+    }
+
+    /* 當前時間指示線 */
+    .current-time-line {
+      position: absolute;
+      left: 50px;
+      right: 16px;
+      height: 2px;
+      background: #ef4444;
+      z-index: 10;
+      display: none;
+    }
+
+    .current-time-line::before {
+      content: '';
+      position: absolute;
+      left: -6px;
+      top: -4px;
+      width: 10px;
+      height: 10px;
+      background: #ef4444;
+      border-radius: 50%;
+    }
+
+    .current-time-indicator {
+      position: absolute;
+      left: 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: #ef4444;
+      font-weight: 600;
+      transform: translateY(-50%);
+    }
+
+    /* Google Sheets 設定 */
+    .settings-toggle {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background: var(--bg-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      transition: all 0.2s;
+    }
+
+    .settings-toggle:hover {
+      border-color: var(--accent-blue);
+    }
+
+    .settings-panel {
+      position: fixed;
+      top: 64px;
+      right: 16px;
+      width: 360px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: var(--shadow-md);
+      z-index: 100;
+      display: none;
+    }
+
+    .settings-panel.show {
+      display: block;
+    }
+
+    .settings-title {
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .settings-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      margin-bottom: 12px;
+    }
+
+    .settings-input:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+    }
+
+    .settings-hint {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    .settings-btn {
+      width: 100%;
+      padding: 10px;
+      background: var(--accent-blue);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .settings-btn:hover {
+      background: #3a6de8;
+    }
+
+    .connection-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      font-size: 0.8rem;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-secondary);
+    }
+
+    .status-dot.connected {
+      background: var(--tier3-color);
+    }
+
+    /* 響應式 */
+    @media (max-width: 900px) {
+      .container {
+        flex-direction: column;
+      }
+
+      .timer-panel {
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        min-height: auto;
+        padding: 32px 20px;
+      }
+
+      .timeline-panel {
+        min-height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 左側：計時器 -->
+    <div class="timer-panel tier-2" id="timerPanel">
+      <h2 class="panel-title">要專心做什麼？</h2>
+      
+      <div class="tier-selector">
+        <button class="tier-btn" data-tier="1">Tier 1</button>
+        <button class="tier-btn active" data-tier="2">Tier 2</button>
+        <button class="tier-btn" data-tier="3">Tier 3</button>
+      </div>
+
+      <input type="text" class="task-input" placeholder="目的" id="taskInput">
+
+      <div class="clock-container tier-2" id="clockContainer">
+        <div class="clock-face">
+          <div class="clock-marks" id="clockMarks"></div>
+          <div class="clock-hand" id="clockHand"></div>
+          <div class="clock-center"></div>
+        </div>
+      </div>
+
+      <div class="time-display" id="timeDisplay">25:00</div>
+      <div class="time-range" id="timeRange">--:-- → --:--</div>
+
+      <div class="duration-selector">
+        <button class="duration-btn" data-minutes="15">15分</button>
+        <button class="duration-btn active" data-minutes="25">25分</button>
+        <button class="duration-btn" data-minutes="45">45分</button>
+        <button class="duration-btn" data-minutes="60">60分</button>
+      </div>
+
+      <button class="start-btn" id="startBtn">開始 SESSION</button>
+    </div>
+
+    <!-- 右側：時間軸 -->
+    <div class="timeline-panel">
+      <div class="calendar-nav">
+        <button class="nav-btn" id="prevWeek">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+        </button>
+        <button class="today-btn" id="todayBtn">今天</button>
+        <button class="nav-btn" id="nextWeek">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="week-view" id="weekView"></div>
+
+      <div class="stats-summary" id="statsSummary">
+        <span class="stats-text">今日專注 <strong>0分鐘</strong></span>
+      </div>
+
+      <div class="timeline" id="timeline"></div>
+    </div>
+  </div>
+
+  <!-- 設定按鈕 -->
+  <button class="settings-toggle" id="settingsToggle">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+    </svg>
+  </button>
+
+  <!-- 設定面板 -->
+  <div class="settings-panel" id="settingsPanel">
+    <h3 class="settings-title">Google Sheets 連結</h3>
+    <input type="text" class="settings-input" id="sheetUrl" placeholder="貼上 Apps Script Web App URL">
+    <p class="settings-hint">
+      部署 Google Apps Script 為 Web App 後，將產生的 URL 貼到此處即可同步記錄。
+    </p>
+    <button class="settings-btn" id="saveSettings">儲存設定</button>
+    <div class="connection-status">
+      <span class="status-dot" id="statusDot"></span>
+      <span id="statusText">尚未連結</span>
+    </div>
+  </div>
+
+  <!-- 音效 -->
+  <audio id="alarmSound" preload="auto">
+    <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleRYVW6LR06FkFRpLltDcs3cvIDua0+CsaRsXQ5LP4LpxIxc3g8Pbs3sgHDGIzN63eSQaLYDG2rpzIBkrisrduXMlHi+DyNu2cCMZLYjJ3bdyJBwwg8nbtnAjGi2Iyd23ciQcMIPJ27ZwIxothsndt3IkHDCDydu2cCMaLYbJ3bdyJBwwg8nbtnAjGi2Gyd23ciQcMIPJ27ZwIxothsndt3IkHDCDydu2cCMaLYbJ3bdyJBwwg8nbtnAjGi2Gyd23ciQcMIPJ27ZwIxothsndt3IkHDCDydu2cCMaLYbJ3bdyJBwwg8nbtnAjGi2Gyd23ciQcMIPJ27ZwIxothsndt3IkHDCDydu2cCMaLYbJ3bdyJBwwg8nbtnAjGi2Gyd23ciQcMA==" type="audio/wav">
+  </audio>
+
+  <script>
+    // ============ 狀態管理 ============
+    const state = {
+      duration: 25,
+      timeLeft: 25 * 60,
+      overtime: 0,           // 超時秒數
+      isRunning: false,
+      isOvertime: false,     // 是否進入超時狀態
+      startTime: null,
+      endTime: null,
+      actualEndTime: null,   // 實際結束時間（含超時）
+      selectedTier: 2,
+      selectedDate: new Date(),
+      weekOffset: 0,
+      sheetUrl: localStorage.getItem('sheetUrl') || '',
+      sessions: JSON.parse(localStorage.getItem('sessions') || '[]'),
+      intervalId: null
+    };
+
+    // ============ DOM 元素 ============
+    const elements = {
+      taskInput: document.getElementById('taskInput'),
+      timeDisplay: document.getElementById('timeDisplay'),
+      timeRange: document.getElementById('timeRange'),
+      startBtn: document.getElementById('startBtn'),
+      clockHand: document.getElementById('clockHand'),
+      clockContainer: document.getElementById('clockContainer'),
+      timerPanel: document.getElementById('timerPanel'),
+      weekView: document.getElementById('weekView'),
+      timeline: document.getElementById('timeline'),
+      statsSummary: document.getElementById('statsSummary'),
+      settingsToggle: document.getElementById('settingsToggle'),
+      settingsPanel: document.getElementById('settingsPanel'),
+      sheetUrl: document.getElementById('sheetUrl'),
+      saveSettings: document.getElementById('saveSettings'),
+      statusDot: document.getElementById('statusDot'),
+      statusText: document.getElementById('statusText'),
+      alarmSound: document.getElementById('alarmSound')
+    };
+
+    // ============ 初始化 ============
+    function init() {
+      generateClockMarks();
+      setupEventListeners();
+      updateClockDisplay();
+      
+      renderWeekView();
+      renderTimeline();
+      updateConnectionStatus();
+      
+      if (state.sheetUrl) {
+        elements.sheetUrl.value = state.sheetUrl;
+        loadSessionsFromSheet();
+      }
+    }
+
+    function generateClockMarks() {
+      const container = document.getElementById('clockMarks');
+      for (let i = 0; i < 60; i++) {
+        const mark = document.createElement('div');
+        mark.className = `clock-mark ${i % 5 === 0 ? 'major' : ''}`;
+        mark.style.transform = `rotate(${i * 6}deg)`;
+        container.appendChild(mark);
+      }
+    }
+
+    // ============ 事件監聽 ============
+    function setupEventListeners() {
+      document.querySelectorAll('.tier-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.tier-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          state.selectedTier = parseInt(btn.dataset.tier);
+          updateClockTierColor();
+        });
+      });
+
+      document.querySelectorAll('.duration-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (state.isRunning) return;
+          document.querySelectorAll('.duration-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          state.duration = parseInt(btn.dataset.minutes);
+          state.timeLeft = state.duration * 60;
+          updateClockDisplay();
+          
+        });
+      });
+
+      elements.startBtn.addEventListener('click', toggleTimer);
+
+      document.getElementById('prevWeek').addEventListener('click', () => {
+        state.weekOffset--;
+        renderWeekView();
+      });
+
+      document.getElementById('nextWeek').addEventListener('click', () => {
+        state.weekOffset++;
+        renderWeekView();
+      });
+
+      document.getElementById('todayBtn').addEventListener('click', () => {
+        state.weekOffset = 0;
+        state.selectedDate = new Date();
+        renderWeekView();
+        renderTimeline();
+      });
+
+      elements.settingsToggle.addEventListener('click', () => {
+        elements.settingsPanel.classList.toggle('show');
+      });
+
+      elements.saveSettings.addEventListener('click', saveSettings);
+
+      document.addEventListener('click', (e) => {
+        if (!elements.settingsPanel.contains(e.target) && 
+            !elements.settingsToggle.contains(e.target)) {
+          elements.settingsPanel.classList.remove('show');
+        }
+      });
+    }
+
+    // ============ 計時器邏輯 ============
+    function toggleTimer() {
+      if (state.isOvertime) {
+        // 超時狀態下按按鈕 = 確認結束
+        confirmComplete();
+      } else if (state.isRunning) {
+        stopTimer(false);
+      } else {
+        startTimer();
+      }
+    }
+
+    function startTimer() {
+      const now = new Date();
+      state.startTime = now;
+      state.endTime = new Date(now.getTime() + state.duration * 60 * 1000);
+      state.isRunning = true;
+      state.isOvertime = false;
+      state.overtime = 0;
+      state.timeLeft = state.duration * 60;
+
+      elements.startBtn.textContent = '停止 SESSION';
+      elements.startBtn.classList.add('running');
+      elements.startBtn.classList.remove('overtime');
+
+      updateTimeRange();
+
+      state.intervalId = setInterval(() => {
+        if (state.isOvertime) {
+          // 超時模式：往上計時
+          state.overtime++;
+          updateClockDisplay();
+        } else {
+          // 正常模式：倒數計時
+          state.timeLeft--;
+          updateClockDisplay();
+          updateClockHand();
+
+          if (state.timeLeft <= 0) {
+            enterOvertimeMode();
+          }
+        }
+      }, 1000);
+    }
+
+    function enterOvertimeMode() {
+      state.isOvertime = true;
+      state.overtime = 0;
+      playAlarm();
+      
+      // 更新按鈕為「確認完成」
+      elements.startBtn.textContent = '確認完成';
+      elements.startBtn.classList.remove('running');
+      elements.startBtn.classList.add('overtime');
+      
+      // 時鐘指針停在終點
+      elements.clockHand.style.transform = 'rotate(360deg)';
+    }
+
+    function confirmComplete() {
+      clearInterval(state.intervalId);
+      state.isRunning = false;
+      state.isOvertime = false;
+      state.actualEndTime = new Date();
+
+      // 儲存 session（包含超時時間）
+      saveSession();
+
+      // 重置 UI
+      resetTimerUI();
+    }
+
+    function stopTimer(completed) {
+      clearInterval(state.intervalId);
+      state.isRunning = false;
+      state.isOvertime = false;
+
+      if (completed) {
+        playAlarm();
+        saveSession();
+      }
+
+      resetTimerUI();
+    }
+
+    function resetTimerUI() {
+      elements.startBtn.textContent = '開始 SESSION';
+      elements.startBtn.classList.remove('running', 'overtime');
+
+      state.timeLeft = state.duration * 60;
+      state.overtime = 0;
+      updateClockDisplay();
+      updateClockHand();
+      elements.timeRange.textContent = '--:-- → --:--';
+    }
+
+    function playAlarm() {
+      elements.alarmSound.currentTime = 0;
+      elements.alarmSound.play().catch(() => {});
+      
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('專注時間結束！', {
+          body: elements.taskInput.value || '休息一下吧'
+        });
+      }
+    }
+
+    // ============ 顯示更新 ============
+    function updateClockTierColor() {
+      elements.clockContainer.classList.remove('tier-1', 'tier-2', 'tier-3');
+      elements.clockContainer.classList.add(`tier-${state.selectedTier}`);
+      elements.timerPanel.classList.remove('tier-1', 'tier-2', 'tier-3');
+      elements.timerPanel.classList.add(`tier-${state.selectedTier}`);
+    }
+
+    function updateClockDisplay() {
+      if (state.isOvertime) {
+        // 超時模式：顯示 +MM:SS
+        const minutes = Math.floor(state.overtime / 60);
+        const seconds = state.overtime % 60;
+        elements.timeDisplay.textContent = 
+          `+${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        elements.timeDisplay.classList.add('overtime');
+      } else {
+        // 正常模式：顯示倒數
+        const minutes = Math.floor(state.timeLeft / 60);
+        const seconds = state.timeLeft % 60;
+        elements.timeDisplay.textContent = 
+          `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        elements.timeDisplay.classList.remove('overtime');
+      }
+    }
+
+    function updateClockHand() {
+      const progress = 1 - (state.timeLeft / (state.duration * 60));
+      const angle = progress * 360;
+      elements.clockHand.style.transform = `rotate(${angle}deg)`;
+    }
+
+    function updateTimeRange() {
+      const format = (date) => {
+        return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+      };
+      elements.timeRange.textContent = `${format(state.startTime)} → ${format(state.endTime)}`;
+    }
+
+    // ============ 週視圖 ============
+    function renderWeekView() {
+      const today = new Date();
+      const startOfWeek = new Date(today);
+      startOfWeek.setDate(today.getDate() - today.getDay() + 1 + state.weekOffset * 7);
+
+      const days = ['週一', '週二', '週三', '週四', '週五', '週六', '週日'];
+      let html = '';
+
+      for (let i = 0; i < 7; i++) {
+        const date = new Date(startOfWeek);
+        date.setDate(startOfWeek.getDate() + i);
+        
+        const isActive = isSameDay(date, state.selectedDate);
+        const dayHours = getDayTotalMinutes(date);
+
+        html += `
+          <div class="day-column ${isActive ? 'active' : ''}" data-date="${date.toISOString()}">
+            <div class="day-label">${days[i]}</div>
+            <div class="day-number">${date.getDate()}</div>
+            <div class="day-hours">${dayHours > 0 ? (dayHours / 60).toFixed(2) : '0.00'}</div>
+          </div>
+        `;
+      }
+
+      elements.weekView.innerHTML = html;
+
+      document.querySelectorAll('.day-column').forEach(col => {
+        col.addEventListener('click', () => {
+          state.selectedDate = new Date(col.dataset.date);
+          renderWeekView();
+          renderTimeline();
+        });
+      });
+    }
+
+    function isSameDay(d1, d2) {
+      return d1.getFullYear() === d2.getFullYear() &&
+             d1.getMonth() === d2.getMonth() &&
+             d1.getDate() === d2.getDate();
+    }
+
+    function getDayTotalMinutes(date) {
+      return state.sessions
+        .filter(s => isSameDay(new Date(s.startTime), date))
+        .reduce((sum, s) => sum + s.duration, 0);
+    }
+
+    // ============ 時間軸 ============
+    function renderTimeline() {
+      const daySessions = state.sessions.filter(s => 
+        isSameDay(new Date(s.startTime), state.selectedDate)
+      );
+
+      let html = '';
+      for (let hour = 6; hour <= 23; hour++) {
+        html += `
+          <div class="time-slot" data-hour="${hour}">
+            <div class="time-label">${hour.toString().padStart(2, '0')}:00</div>
+            <div class="slot-content" id="slot-${hour}"></div>
+          </div>
+        `;
+      }
+      elements.timeline.innerHTML = html;
+
+      daySessions.forEach(session => {
+        const start = new Date(session.startTime);
+        const hour = start.getHours();
+        const minute = start.getMinutes();
+        
+        if (hour < 6 || hour > 23) return;
+
+        const slot = document.getElementById(`slot-${hour}`);
+        if (!slot) return;
+
+        const topOffset = (minute / 60) * 60;
+        const height = Math.min((session.duration / 60) * 60, 180);
+
+        const block = document.createElement('div');
+        block.className = 'focus-block';
+        block.dataset.tier = session.tier;
+        block.style.top = `${topOffset}px`;
+        block.style.height = `${Math.max(height, 40)}px`;
+        block.innerHTML = `
+          <div class="block-time">${formatTime(start)}</div>
+          <div class="block-title">${session.task || '專注'}</div>
+          <div class="block-tier">Tier ${session.tier}</div>
+          <div class="block-duration">${session.duration}min</div>
+        `;
+        slot.appendChild(block);
+      });
+
+      if (isSameDay(state.selectedDate, new Date())) {
+        showCurrentTimeLine();
+      }
+
+      const totalMinutes = getDayTotalMinutes(state.selectedDate);
+      const hours = Math.floor(totalMinutes / 60);
+      const mins = totalMinutes % 60;
+      const timeStr = hours > 0 ? `${hours}小時${mins}分鐘` : `${mins}分鐘`;
+      elements.statsSummary.innerHTML = `<span class="stats-text">今日專注 <strong>${timeStr}</strong></span>`;
+    }
+
+    function showCurrentTimeLine() {
+      const now = new Date();
+      const hour = now.getHours();
+      const minute = now.getMinutes();
+
+      if (hour < 6 || hour > 23) return;
+
+      const slot = document.querySelector(`.time-slot[data-hour="${hour}"]`);
+      if (!slot) return;
+
+      const topOffset = (minute / 60) * 60;
+      
+      const line = document.createElement('div');
+      line.className = 'current-time-line';
+      line.style.display = 'block';
+      line.style.top = `${topOffset}px`;
+      line.innerHTML = `<span class="current-time-indicator">${formatTime(now)}</span>`;
+      
+      slot.querySelector('.slot-content').appendChild(line);
+    }
+
+    function formatTime(date) {
+      return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+    }
+
+    // ============ 資料儲存 ============
+    function saveSession() {
+      const actualEnd = state.actualEndTime || new Date();
+      const actualDuration = state.duration + Math.floor(state.overtime / 60);
+      
+      const session = {
+        id: Date.now(),
+        task: elements.taskInput.value || '專注',
+        tier: state.selectedTier,
+        duration: actualDuration,           // 實際花費分鐘（含超時）
+        plannedDuration: state.duration,    // 原定時長
+        overtime: state.overtime,           // 超時秒數
+        startTime: state.startTime.toISOString(),
+        endTime: actualEnd.toISOString(),   // 實際結束時間
+        completed: true
+      };
+
+      state.sessions.push(session);
+      localStorage.setItem('sessions', JSON.stringify(state.sessions));
+      
+      if (state.sheetUrl) {
+        syncToSheet(session);
+      }
+
+      renderWeekView();
+      renderTimeline();
+    }
+
+    // ============ Google Sheets 整合 ============
+    function saveSettings() {
+      state.sheetUrl = elements.sheetUrl.value.trim();
+      localStorage.setItem('sheetUrl', state.sheetUrl);
+      updateConnectionStatus();
+      
+      if (state.sheetUrl) {
+        testConnection();
+      }
+    }
+
+    function updateConnectionStatus() {
+      if (state.sheetUrl) {
+        elements.statusDot.classList.add('connected');
+        elements.statusText.textContent = '已設定連結';
+      } else {
+        elements.statusDot.classList.remove('connected');
+        elements.statusText.textContent = '尚未連結';
+      }
+    }
+
+    async function testConnection() {
+      try {
+        const response = await fetch(state.sheetUrl);
+        if (response.ok) {
+          elements.statusText.textContent = '連線成功';
+          loadSessionsFromSheet();
+        }
+      } catch (e) {
+        elements.statusText.textContent = '連線失敗';
+      }
+    }
+
+    async function syncToSheet(session) {
+      if (!state.sheetUrl) return;
+
+      try {
+        await fetch(state.sheetUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(session)
+        });
+      } catch (e) {
+        console.error('Sync failed:', e);
+      }
+    }
+
+    async function loadSessionsFromSheet() {
+      if (!state.sheetUrl) return;
+
+      try {
+        const response = await fetch(state.sheetUrl);
+        if (response.ok) {
+          const data = await response.json();
+          if (Array.isArray(data) && data.length > 1) {
+            state.sessions = data.slice(1).map(row => ({
+              id: row[0],
+              task: row[1],
+              tier: parseInt(row[2]),
+              duration: parseInt(row[3]),
+              startTime: row[4],
+              endTime: row[5],
+              completed: row[6] === 'true' || row[6] === true
+            })).filter(s => s.startTime);
+            
+            localStorage.setItem('sessions', JSON.stringify(state.sessions));
+            renderWeekView();
+            renderTimeline();
+          }
+        }
+      } catch (e) {
+        console.error('Load failed:', e);
+      }
+    }
+
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+
+    init();
+  </script>
+</body>
+</html>
