@@ -1089,8 +1089,10 @@
       duration: 25,
       timeLeft: 25 * 60,
       overtime: 0,           // 超時秒數
+      elapsedMinutes: 0,     // 已花費分鐘（中途放棄用）
       isRunning: false,
       isOvertime: false,     // 是否進入超時狀態
+      isAbandoned: false,    // 是否為中途放棄
       startTime: null,
       endTime: null,
       actualEndTime: null,   // 實際結束時間（含超時）
@@ -1384,9 +1386,10 @@
     }
 
     function showReflectionModal() {
+      state.isAbandoned = false;
+      
       // 計算實際時長
       const actualMinutes = state.duration + Math.floor(state.overtime / 60);
-      const overtimeSecs = state.overtime % 60;
       
       // 顯示統計
       let statsHtml = `
@@ -1418,6 +1421,11 @@
         </div>
       `;
       
+      // 重置 modal 標題和按鈕
+      document.querySelector('#reflectionModal .modal-title').textContent = 'Session 完成';
+      elements.abandonBtn.textContent = '放棄（仍計時間）';
+      elements.confirmBtn.textContent = '完成 Session';
+      
       elements.modalStats.innerHTML = statsHtml;
       elements.reflectionInput.value = '';
       elements.reflectionModal.classList.add('show');
@@ -1427,8 +1435,18 @@
       state.isRunning = false;
       state.isOvertime = false;
       
-      // 儲存 session
-      saveSession(abandoned);
+      // 判斷是否為中途放棄
+      const isEarlyStop = state.isAbandoned;
+      
+      if (abandoned && isEarlyStop) {
+        // 中途放棄且選擇不計時間
+        elements.reflectionModal.classList.remove('show');
+        resetTimerUI();
+        return;
+      }
+      
+      // 儲存 session（計入時間）
+      saveSession(abandoned, isEarlyStop);
       
       // 關閉 modal
       elements.reflectionModal.classList.remove('show');
@@ -1437,17 +1455,49 @@
       resetTimerUI();
     }
 
-    function stopTimer(completed) {
+    function stopTimer() {
+      // 中途停止，計算已經花費的時間
       clearInterval(state.intervalId);
-      state.isRunning = false;
-      state.isOvertime = false;
+      state.actualEndTime = new Date();
+      state.isAbandoned = true;
+      
+      // 計算已花費時間（秒）
+      const elapsedSeconds = Math.floor((state.actualEndTime - state.startTime) / 1000);
+      state.elapsedMinutes = Math.floor(elapsedSeconds / 60);
+      
+      // 顯示放棄確認 modal
+      showAbandonModal();
+    }
 
-      if (completed) {
-        playAlarm();
-        saveSession(false);
-      }
-
-      resetTimerUI();
+    function showAbandonModal() {
+      const elapsedMin = state.elapsedMinutes;
+      const elapsedSec = Math.floor((state.actualEndTime - state.startTime) / 1000) % 60;
+      
+      let statsHtml = `
+        <div class="stat-row">
+          <span class="stat-label">任務</span>
+          <span class="stat-value">${elements.taskInput.value || '專注'}</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">原定時長</span>
+          <span class="stat-value">${state.duration} 分鐘</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">已專注</span>
+          <span class="stat-value">${elapsedMin}:${elapsedSec.toString().padStart(2, '0')}</span>
+        </div>
+      `;
+      
+      elements.modalStats.innerHTML = statsHtml;
+      elements.reflectionInput.value = '';
+      
+      // 更新 modal 標題和按鈕
+      document.querySelector('#reflectionModal .modal-title').textContent = '中途結束';
+      elements.abandonBtn.textContent = '不計時間';
+      elements.confirmBtn.textContent = '計入時間';
+      
+      elements.reflectionModal.classList.add('show');
+    }
     }
 
     function resetTimerUI() {
@@ -1640,22 +1690,31 @@
     }
 
     // ============ 資料儲存 ============
-    function saveSession(abandoned = false) {
+    function saveSession(abandoned = false, isEarlyStop = false) {
       const actualEnd = state.actualEndTime || new Date();
-      const actualDuration = state.duration + Math.floor(state.overtime / 60);
       const reflection = elements.reflectionInput ? elements.reflectionInput.value.trim() : '';
+      
+      // 計算實際時長
+      let actualDuration;
+      if (isEarlyStop) {
+        // 中途放棄：使用已花費的分鐘數
+        actualDuration = state.elapsedMinutes;
+      } else {
+        // 正常完成或超時：原定時長 + 超時
+        actualDuration = state.duration + Math.floor(state.overtime / 60);
+      }
       
       const session = {
         task: elements.taskInput.value || '專注',
         tier: state.selectedTier,
-        duration: actualDuration,           // 實際花費分鐘（含超時）
+        duration: actualDuration,           // 實際花費分鐘
         plannedDuration: state.duration,    // 原定時長
         overtime: state.overtime,           // 超時秒數
         startTime: state.startTime.toISOString(),
         endTime: actualEnd.toISOString(),   // 實際結束時間
         reflection: reflection,             // 反思內容
-        abandoned: abandoned,               // 是否放棄
-        completed: !abandoned
+        abandoned: abandoned || isEarlyStop, // 是否放棄
+        completed: !abandoned && !isEarlyStop
       };
 
       state.sessions.push(session);
