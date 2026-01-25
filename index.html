@@ -1737,20 +1737,22 @@
         if (response.ok) {
           const data = await response.json();
           
-          // 新格式：任務, Tier, 時長(分), 原定時長, 超時(秒), 開始時間, 結束時間, 反思, 狀態
+          // 簡化格式：日期, 任務, Tier, 時長(分), 反思
           if (Array.isArray(data) && data.length > 1) {
-            const sheetSessions = data.slice(1).map(row => ({
-              task: row[0] || '專注',
-              tier: parseInt(row[1]) || 2,
-              duration: parseInt(row[2]) || 25,
-              plannedDuration: parseInt(row[3]) || 25,
-              overtime: parseInt(row[4]) || 0,
-              startTime: parseSheetDateTime(row[5]),
-              endTime: parseSheetDateTime(row[6]),
-              reflection: row[7] || '',
-              abandoned: row[8] === '放棄',
-              completed: row[8] !== '放棄'
-            })).filter(s => s.startTime);
+            const sheetSessions = data.slice(1).map(row => {
+              // 解析日期 "1/26 週日" 格式
+              const dateStr = row[0] || '';
+              const startTime = parseDateString(dateStr);
+              
+              return {
+                task: row[1] || '專注',
+                tier: parseInt(row[2]) || 2,
+                duration: parseInt(row[3]) || 25,
+                startTime: startTime,
+                reflection: row[4] || '',
+                completed: true
+              };
+            }).filter(s => s.startTime);
             
             // 合併：以 startTime 為 key 去重
             const existingKeys = new Set(state.sessions.map(s => s.startTime));
@@ -1758,7 +1760,6 @@
             
             if (newSessions.length > 0) {
               state.sessions = [...state.sessions, ...newSessions];
-              // 依開始時間排序
               state.sessions.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
               localStorage.setItem('sessions', JSON.stringify(state.sessions));
             }
@@ -1780,16 +1781,19 @@
       }
     }
 
-    // 解析 Sheets 的時間格式 (yyyy-MM-dd HH:mm:ss)
-    function parseSheetDateTime(dateStr) {
+    // 解析 "1/26 週日" 格式的日期
+    function parseDateString(dateStr) {
       if (!dateStr) return null;
-      // 如果已經是 ISO 格式，直接回傳
-      if (dateStr.includes('T')) return dateStr;
-      // 轉換 "2025-01-20 14:30:00" 為 ISO
       try {
-        const [datePart, timePart] = dateStr.split(' ');
-        if (datePart && timePart) {
-          return new Date(`${datePart}T${timePart}+08:00`).toISOString();
+        // 提取 M/D
+        const match = dateStr.match(/(\d{1,2})\/(\d{1,2})/);
+        if (match) {
+          const month = parseInt(match[1]);
+          const day = parseInt(match[2]);
+          const year = new Date().getFullYear();
+          // 建立日期（預設當年）
+          const date = new Date(year, month - 1, day, 12, 0, 0);
+          return date.toISOString();
         }
         return null;
       } catch (e) {
