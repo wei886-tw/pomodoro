@@ -1094,14 +1094,18 @@
 
       updateTimeRange();
 
+      // 使用時間差計算，避免背景 throttle 問題
       state.intervalId = setInterval(() => {
+        const now = new Date();
+        
         if (state.isOvertime) {
-          // 超時模式：往上計時
-          state.overtime++;
+          // 超時模式：計算從 endTime 到現在經過多久
+          state.overtime = Math.floor((now - state.endTime) / 1000);
           updateClockDisplay();
         } else {
-          // 正常模式：倒數計時
-          state.timeLeft--;
+          // 正常模式：計算距離 endTime 還剩多久
+          const remaining = Math.floor((state.endTime - now) / 1000);
+          state.timeLeft = Math.max(0, remaining);
           updateClockDisplay();
           updateClockHand();
 
@@ -1109,7 +1113,7 @@
             enterOvertimeMode();
           }
         }
-      }, 1000);
+      }, 500); // 更頻繁檢查，確保準確
     }
 
     function enterOvertimeMode() {
