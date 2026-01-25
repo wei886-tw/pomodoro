@@ -810,6 +810,124 @@
       background: var(--border-color);
     }
 
+    .modal-btn.full-width {
+      width: 100%;
+    }
+
+    /* 開始 Modal 樣式 */
+    .modal-input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 1rem;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .modal-input:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+    }
+
+    .modal-tier-selector {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .modal-tier-btn {
+      padding: 8px 20px;
+      border: 2px solid var(--border-color);
+      border-radius: 20px;
+      background: transparent;
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .modal-tier-btn[data-tier="1"] { color: var(--tier1-color); }
+    .modal-tier-btn[data-tier="2"] { color: var(--tier2-color); }
+    .modal-tier-btn[data-tier="3"] { color: var(--tier3-color); }
+
+    .modal-tier-btn.active[data-tier="1"] {
+      background: var(--tier1-color);
+      border-color: var(--tier1-color);
+      color: white;
+    }
+    .modal-tier-btn.active[data-tier="2"] {
+      background: var(--tier2-color);
+      border-color: var(--tier2-color);
+      color: white;
+    }
+    .modal-tier-btn.active[data-tier="3"] {
+      background: var(--tier3-color);
+      border-color: var(--tier3-color);
+      color: white;
+    }
+
+    .modal-duration-selector {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .modal-duration-btn {
+      padding: 8px 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background: transparent;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .modal-duration-btn:hover {
+      border-color: var(--accent-blue);
+    }
+
+    .modal-duration-btn.active {
+      background: var(--accent-blue);
+      border-color: var(--accent-blue);
+      color: white;
+    }
+
+    /* 時間到 Modal 樣式 */
+    .modal-content.time-up {
+      text-align: center;
+      padding: 40px 32px;
+    }
+
+    .time-up-icon {
+      font-size: 4rem;
+      margin-bottom: 16px;
+      animation: shake 0.5s ease-in-out infinite;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: rotate(-5deg); }
+      50% { transform: rotate(5deg); }
+    }
+
+    .time-up-task {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .time-up-hint {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+
     /* 響應式 */
     @media (max-width: 900px) {
       .container {
@@ -912,6 +1030,40 @@
     </div>
   </div>
 
+  <!-- 開始前 Modal -->
+  <div class="modal-overlay" id="startModal">
+    <div class="modal-content">
+      <h3 class="modal-title">要專心做什麼？</h3>
+      <input type="text" class="modal-input" id="startTaskInput" placeholder="輸入任務名稱">
+      <div class="modal-tier-selector">
+        <button class="modal-tier-btn" data-tier="1">Tier 1</button>
+        <button class="modal-tier-btn active" data-tier="2">Tier 2</button>
+        <button class="modal-tier-btn" data-tier="3">Tier 3</button>
+      </div>
+      <div class="modal-duration-selector">
+        <button class="modal-duration-btn" data-minutes="15">15分</button>
+        <button class="modal-duration-btn active" data-minutes="25">25分</button>
+        <button class="modal-duration-btn" data-minutes="45">45分</button>
+        <button class="modal-duration-btn" data-minutes="60">60分</button>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn secondary" id="cancelStartBtn">取消</button>
+        <button class="modal-btn primary" id="confirmStartBtn">開始專注</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 時間到 Modal -->
+  <div class="modal-overlay" id="timeUpModal">
+    <div class="modal-content time-up">
+      <div class="time-up-icon">⏰</div>
+      <h3 class="modal-title">時間到！</h3>
+      <p class="time-up-task" id="timeUpTask"></p>
+      <p class="time-up-hint">沒按確認會繼續計時</p>
+      <button class="modal-btn primary full-width" id="timeUpConfirmBtn">確認完成</button>
+    </div>
+  </div>
+
   <!-- 反思 Modal -->
   <div class="modal-overlay" id="reflectionModal">
     <div class="modal-content">
@@ -969,6 +1121,16 @@
       statusDot: document.getElementById('statusDot'),
       statusText: document.getElementById('statusText'),
       alarmSound: document.getElementById('alarmSound'),
+      // 開始 Modal
+      startModal: document.getElementById('startModal'),
+      startTaskInput: document.getElementById('startTaskInput'),
+      cancelStartBtn: document.getElementById('cancelStartBtn'),
+      confirmStartBtn: document.getElementById('confirmStartBtn'),
+      // 時間到 Modal
+      timeUpModal: document.getElementById('timeUpModal'),
+      timeUpTask: document.getElementById('timeUpTask'),
+      timeUpConfirmBtn: document.getElementById('timeUpConfirmBtn'),
+      // 反思 Modal
       reflectionModal: document.getElementById('reflectionModal'),
       modalStats: document.getElementById('modalStats'),
       reflectionInput: document.getElementById('reflectionInput'),
@@ -1057,7 +1219,52 @@
         }
       });
 
-      // Modal 事件
+      // 開始 Modal 事件
+      elements.cancelStartBtn.addEventListener('click', () => {
+        elements.startModal.classList.remove('show');
+      });
+
+      elements.confirmStartBtn.addEventListener('click', () => {
+        elements.startModal.classList.remove('show');
+        // 同步設定到主畫面
+        elements.taskInput.value = elements.startTaskInput.value;
+        actuallyStartTimer();
+      });
+
+      // Modal 內的 Tier 選擇
+      document.querySelectorAll('.modal-tier-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.modal-tier-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          state.selectedTier = parseInt(btn.dataset.tier);
+          // 同步主畫面
+          document.querySelectorAll('.tier-btn').forEach(b => b.classList.remove('active'));
+          document.querySelector(`.tier-btn[data-tier="${state.selectedTier}"]`).classList.add('active');
+          updateClockTierColor();
+        });
+      });
+
+      // Modal 內的時長選擇
+      document.querySelectorAll('.modal-duration-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.modal-duration-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          state.duration = parseInt(btn.dataset.minutes);
+          state.timeLeft = state.duration * 60;
+          // 同步主畫面
+          document.querySelectorAll('.duration-btn').forEach(b => b.classList.remove('active'));
+          document.querySelector(`.duration-btn[data-minutes="${state.duration}"]`).classList.add('active');
+          updateClockDisplay();
+        });
+      });
+
+      // 時間到 Modal 事件
+      elements.timeUpConfirmBtn.addEventListener('click', () => {
+        elements.timeUpModal.classList.remove('show');
+        confirmComplete();
+      });
+
+      // 反思 Modal 事件
       elements.confirmBtn.addEventListener('click', () => {
         completeSession(false);
       });
@@ -1075,11 +1282,27 @@
       } else if (state.isRunning) {
         stopTimer(false);
       } else {
-        startTimer();
+        showStartModal();
       }
     }
 
-    function startTimer() {
+    function showStartModal() {
+      // 同步當前設定到 Modal
+      elements.startTaskInput.value = elements.taskInput.value;
+      
+      // 同步 Tier
+      document.querySelectorAll('.modal-tier-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector(`.modal-tier-btn[data-tier="${state.selectedTier}"]`).classList.add('active');
+      
+      // 同步時長
+      document.querySelectorAll('.modal-duration-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector(`.modal-duration-btn[data-minutes="${state.duration}"]`).classList.add('active');
+      
+      elements.startModal.classList.add('show');
+      elements.startTaskInput.focus();
+    }
+
+    function actuallyStartTimer() {
       const now = new Date();
       state.startTime = now;
       state.endTime = new Date(now.getTime() + state.duration * 60 * 1000);
@@ -1093,6 +1316,7 @@
       elements.startBtn.classList.remove('overtime');
 
       updateTimeRange();
+      updateClockTierColor();
 
       // 使用時間差計算，避免背景 throttle 問題
       state.intervalId = setInterval(() => {
@@ -1113,14 +1337,14 @@
             enterOvertimeMode();
           }
         }
-      }, 500); // 更頻繁檢查，確保準確
+      }, 500);
     }
 
     function enterOvertimeMode() {
       state.isOvertime = true;
       state.overtime = 0;
       playAlarm();
-      showNotification();
+      showTimeUpModal();
       
       // 更新按鈕為「確認完成」
       elements.startBtn.textContent = '確認完成';
@@ -1131,20 +1355,28 @@
       elements.clockHand.style.transform = 'rotate(360deg)';
     }
 
-    function showNotification() {
+    function showTimeUpModal() {
+      elements.timeUpTask.textContent = elements.taskInput.value || '專注時段';
+      elements.timeUpModal.classList.add('show');
+      
+      // 也發送系統通知
       if ('Notification' in window && Notification.permission === 'granted') {
-        const notification = new Notification('專注時間結束！', {
+        const notification = new Notification('時間到！', {
           body: `${elements.taskInput.value || '專注'} - 點擊確認完成`,
           requireInteraction: true
         });
         notification.onclick = () => {
           window.focus();
-          showReflectionModal();
+          elements.timeUpModal.classList.remove('show');
+          confirmComplete();
         };
       }
     }
 
     function confirmComplete() {
+      // 關閉時間到 modal（如果開著）
+      elements.timeUpModal.classList.remove('show');
+      
       // 停止計時，顯示反思 modal
       clearInterval(state.intervalId);
       state.actualEndTime = new Date();
@@ -1499,29 +1731,69 @@
       if (!state.sheetUrl) return;
 
       try {
-        // GET 請求 - Apps Script 需要回傳 JSONP 或設定 CORS
+        elements.statusText.textContent = '同步中...';
+        
         const response = await fetch(`${state.sheetUrl}?_=${Date.now()}`);
         if (response.ok) {
           const data = await response.json();
+          
+          // 新格式：任務, Tier, 時長(分), 原定時長, 超時(秒), 開始時間, 結束時間, 反思, 狀態
           if (Array.isArray(data) && data.length > 1) {
-            state.sessions = data.slice(1).map(row => ({
-              id: row[0],
-              task: row[1],
-              tier: parseInt(row[2]),
-              duration: parseInt(row[3]),
-              startTime: row[4],
-              endTime: row[5],
-              completed: row[6] === 'true' || row[6] === true
+            const sheetSessions = data.slice(1).map(row => ({
+              task: row[0] || '專注',
+              tier: parseInt(row[1]) || 2,
+              duration: parseInt(row[2]) || 25,
+              plannedDuration: parseInt(row[3]) || 25,
+              overtime: parseInt(row[4]) || 0,
+              startTime: parseSheetDateTime(row[5]),
+              endTime: parseSheetDateTime(row[6]),
+              reflection: row[7] || '',
+              abandoned: row[8] === '放棄',
+              completed: row[8] !== '放棄'
             })).filter(s => s.startTime);
             
-            localStorage.setItem('sessions', JSON.stringify(state.sessions));
+            // 合併：以 startTime 為 key 去重
+            const existingKeys = new Set(state.sessions.map(s => s.startTime));
+            const newSessions = sheetSessions.filter(s => !existingKeys.has(s.startTime));
+            
+            if (newSessions.length > 0) {
+              state.sessions = [...state.sessions, ...newSessions];
+              // 依開始時間排序
+              state.sessions.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
+              localStorage.setItem('sessions', JSON.stringify(state.sessions));
+            }
+            
             renderWeekView();
             renderTimeline();
-            elements.statusText.textContent = '已同步';
+            elements.statusText.textContent = `已同步 (${sheetSessions.length} 筆)`;
+            elements.statusDot.classList.add('connected');
+          } else {
+            elements.statusText.textContent = '已連線（無資料）';
+            elements.statusDot.classList.add('connected');
           }
+        } else {
+          elements.statusText.textContent = '同步失敗';
         }
       } catch (e) {
-        console.log('無法讀取遠端資料，使用本地資料');
+        console.log('無法讀取遠端資料：', e);
+        elements.statusText.textContent = '無法同步';
+      }
+    }
+
+    // 解析 Sheets 的時間格式 (yyyy-MM-dd HH:mm:ss)
+    function parseSheetDateTime(dateStr) {
+      if (!dateStr) return null;
+      // 如果已經是 ISO 格式，直接回傳
+      if (dateStr.includes('T')) return dateStr;
+      // 轉換 "2025-01-20 14:30:00" 為 ISO
+      try {
+        const [datePart, timePart] = dateStr.split(' ');
+        if (datePart && timePart) {
+          return new Date(`${datePart}T${timePart}+08:00`).toISOString();
+        }
+        return null;
+      } catch (e) {
+        return null;
       }
     }
 
