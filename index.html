@@ -1,16 +1,13 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>專注時鐘</title>
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" href="./favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -29,8 +26,8 @@
       --tier2-color: #4a7dfc;
       --tier3-color: #22c55e;
       --border-color: #e5e7eb;
-      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
-      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
     }
 
     body {
@@ -182,30 +179,20 @@
       transition: all 0.2s ease;
     }
 
-    .tier-btn[data-tier="1"] {
-      color: var(--tier1-color);
-    }
-
-    .tier-btn[data-tier="2"] {
-      color: var(--tier2-color);
-    }
-
-    .tier-btn[data-tier="3"] {
-      color: var(--tier3-color);
-    }
+    .tier-btn[data-tier="1"] { color: var(--tier1-color); }
+    .tier-btn[data-tier="2"] { color: var(--tier2-color); }
+    .tier-btn[data-tier="3"] { color: var(--tier3-color); }
 
     .tier-btn.active[data-tier="1"] {
       background: var(--tier1-color);
       border-color: var(--tier1-color);
       color: white;
     }
-
     .tier-btn.active[data-tier="2"] {
       background: var(--tier2-color);
       border-color: var(--tier2-color);
       color: white;
     }
-
     .tier-btn.active[data-tier="3"] {
       background: var(--tier3-color);
       border-color: var(--tier3-color);
@@ -248,7 +235,7 @@
       height: 100%;
       border-radius: 50%;
       background: var(--bg-secondary);
-      box-shadow: var(--shadow-md), inset 0 0 30px rgba(0, 0, 0, 0.03);
+      box-shadow: var(--shadow-md), inset 0 0 30px rgba(0,0,0,0.03);
       position: relative;
     }
 
@@ -310,11 +297,9 @@
     .clock-container.tier-1 {
       --current-tier-color: var(--tier1-color);
     }
-
     .clock-container.tier-2 {
       --current-tier-color: var(--tier2-color);
     }
-
     .clock-container.tier-3 {
       --current-tier-color: var(--tier3-color);
     }
@@ -323,12 +308,10 @@
     .clock-container.tier-1 .clock-center {
       box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
     }
-
     .clock-container.tier-2 .clock-hand,
     .clock-container.tier-2 .clock-center {
       box-shadow: 0 2px 8px rgba(74, 125, 252, 0.4);
     }
-
     .clock-container.tier-3 .clock-hand,
     .clock-container.tier-3 .clock-center {
       box-shadow: 0 2px 8px rgba(34, 197, 94, 0.4);
@@ -355,17 +338,9 @@
     }
 
     /* 讓 timer-panel 也能接收 tier class */
-    .timer-panel.tier-1 {
-      --current-tier-color: var(--tier1-color);
-    }
-
-    .timer-panel.tier-2 {
-      --current-tier-color: var(--tier2-color);
-    }
-
-    .timer-panel.tier-3 {
-      --current-tier-color: var(--tier3-color);
-    }
+    .timer-panel.tier-1 { --current-tier-color: var(--tier1-color); }
+    .timer-panel.tier-2 { --current-tier-color: var(--tier2-color); }
+    .timer-panel.tier-3 { --current-tier-color: var(--tier3-color); }
 
     /* 時間選擇器 */
     .duration-selector {
@@ -445,15 +420,8 @@
     }
 
     @keyframes pulse-overtime {
-
-      0%,
-      100% {
-        transform: scale(1);
-      }
-
-      50% {
-        transform: scale(1.02);
-      }
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
     }
 
     .time-display.overtime {
@@ -461,16 +429,49 @@
       animation: blink-overtime 1s ease-in-out infinite;
     }
 
+    /* 放棄按鈕 */
+    .abandon-btns {
+      display: none;
+      gap: 12px;
+      margin-top: 16px;
+      width: 100%;
+      max-width: 320px;
+    }
+
+    .abandon-btns.show {
+      display: flex;
+    }
+
+    .abandon-btn {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      background: var(--bg-primary);
+      font-family: inherit;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .abandon-btn:hover {
+      background: var(--border-color);
+    }
+
+    .abandon-btn.no-time {
+      color: var(--tier1-color);
+      border-color: var(--tier1-color);
+    }
+
+    .abandon-btn.no-time:hover {
+      background: var(--tier1-color);
+      color: white;
+    }
+
     @keyframes blink-overtime {
-
-      0%,
-      100% {
-        opacity: 1;
-      }
-
-      50% {
-        opacity: 0.6;
-      }
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
     }
 
     /* 右側面板 - 時間軸 */
@@ -558,7 +559,7 @@
     }
 
     .day-column.active .day-label {
-      color: rgba(255, 255, 255, 0.8);
+      color: rgba(255,255,255,0.8);
     }
 
     .day-number {
@@ -574,7 +575,7 @@
     }
 
     .day-column.active .day-hours {
-      color: rgba(255, 255, 255, 0.8);
+      color: rgba(255,255,255,0.8);
     }
 
     /* 統計摘要 */
@@ -641,17 +642,9 @@
       box-shadow: var(--shadow-sm);
     }
 
-    .focus-block[data-tier="1"] {
-      background: var(--tier1-color);
-    }
-
-    .focus-block[data-tier="2"] {
-      background: var(--tier2-color);
-    }
-
-    .focus-block[data-tier="3"] {
-      background: var(--tier3-color);
-    }
+    .focus-block[data-tier="1"] { background: var(--tier1-color); }
+    .focus-block[data-tier="2"] { background: var(--tier2-color); }
+    .focus-block[data-tier="3"] { background: var(--tier3-color); }
 
     .focus-block .block-time {
       font-family: 'JetBrains Mono', monospace;
@@ -681,13 +674,23 @@
       opacity: 0.9;
     }
 
+    .focus-block {
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .focus-block:hover {
+      transform: scale(1.02);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
     /* 當前時間指示線 */
     .current-time-line {
       position: absolute;
       left: 50px;
       right: 16px;
       height: 2px;
-      background: #ef4444;
+      background: #1a1a2e;
       z-index: 10;
       display: none;
     }
@@ -849,7 +852,6 @@
         opacity: 0;
         transform: scale(0.95) translateY(10px);
       }
-
       to {
         opacity: 1;
         transform: scale(1) translateY(0);
@@ -954,8 +956,37 @@
       background: var(--border-color);
     }
 
+    .modal-btn.danger {
+      background: var(--tier1-color);
+      color: white;
+    }
+
+    .modal-btn.danger:hover {
+      background: #dc2626;
+    }
+
     .modal-btn.full-width {
       width: 100%;
+    }
+
+    .session-reflection {
+      background: var(--bg-primary);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .session-reflection:empty {
+      display: none;
+    }
+
+    .session-reflection::before {
+      content: '反思：';
+      font-weight: 500;
+      color: var(--text-primary);
     }
 
     /* 開始 Modal 樣式 */
@@ -994,30 +1025,20 @@
       transition: all 0.2s;
     }
 
-    .modal-tier-btn[data-tier="1"] {
-      color: var(--tier1-color);
-    }
-
-    .modal-tier-btn[data-tier="2"] {
-      color: var(--tier2-color);
-    }
-
-    .modal-tier-btn[data-tier="3"] {
-      color: var(--tier3-color);
-    }
+    .modal-tier-btn[data-tier="1"] { color: var(--tier1-color); }
+    .modal-tier-btn[data-tier="2"] { color: var(--tier2-color); }
+    .modal-tier-btn[data-tier="3"] { color: var(--tier3-color); }
 
     .modal-tier-btn.active[data-tier="1"] {
       background: var(--tier1-color);
       border-color: var(--tier1-color);
       color: white;
     }
-
     .modal-tier-btn.active[data-tier="2"] {
       background: var(--tier2-color);
       border-color: var(--tier2-color);
       color: white;
     }
-
     .modal-tier-btn.active[data-tier="3"] {
       background: var(--tier3-color);
       border-color: var(--tier3-color);
@@ -1065,15 +1086,8 @@
     }
 
     @keyframes shake {
-
-      0%,
-      100% {
-        transform: rotate(-5deg);
-      }
-
-      50% {
-        transform: rotate(5deg);
-      }
+      0%, 100% { transform: rotate(-5deg); }
+      50% { transform: rotate(5deg); }
     }
 
     .time-up-task {
@@ -1108,7 +1122,6 @@
     }
   </style>
 </head>
-
 <body class="locked">
   <!-- 密碼驗證 -->
   <div class="auth-overlay" id="authOverlay">
@@ -1125,7 +1138,7 @@
     <!-- 左側：計時器 -->
     <div class="timer-panel tier-2" id="timerPanel">
       <h2 class="panel-title">要專心做什麼？</h2>
-
+      
       <div class="tier-selector">
         <button class="tier-btn" data-tier="1">Tier 1</button>
         <button class="tier-btn active" data-tier="2">Tier 2</button>
@@ -1153,6 +1166,11 @@
       </div>
 
       <button class="start-btn" id="startBtn">開始 SESSION</button>
+      
+      <div class="abandon-btns" id="abandonBtns">
+        <button class="abandon-btn" id="abandonWithTimeBtn">放棄（計時）</button>
+        <button class="abandon-btn no-time" id="abandonNoTimeBtn">放棄（不計）</button>
+      </div>
     </div>
 
     <!-- 右側：時間軸 -->
@@ -1160,13 +1178,13 @@
       <div class="calendar-nav">
         <button class="nav-btn" id="prevWeek">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M15 18l-6-6 6-6" />
+            <path d="M15 18l-6-6 6-6"/>
           </svg>
         </button>
         <button class="today-btn" id="todayBtn">今天</button>
         <button class="nav-btn" id="nextWeek">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 18l6-6-6-6" />
+            <path d="M9 18l6-6-6-6"/>
           </svg>
         </button>
       </div>
@@ -1184,9 +1202,8 @@
   <!-- 設定按鈕 -->
   <button class="settings-toggle" id="settingsToggle">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <circle cx="12" cy="12" r="3" />
-      <path
-        d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" />
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
     </svg>
   </button>
 
@@ -1246,24 +1263,35 @@
       <label class="modal-label">反思紀錄（選填）</label>
       <textarea class="modal-textarea" id="reflectionInput" placeholder="這段時間做了什麼？有什麼收穫？"></textarea>
       <div class="modal-actions">
-        <button class="modal-btn secondary" id="abandonBtn">放棄（仍計時間）</button>
+        <button class="modal-btn secondary" id="abandonBtn">取消</button>
         <button class="modal-btn primary" id="confirmBtn">完成 Session</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Session 詳細資料 Modal -->
+  <div class="modal-overlay" id="sessionDetailModal">
+    <div class="modal-content">
+      <h3 class="modal-title">Session 詳細</h3>
+      <div class="modal-stats" id="sessionDetailStats"></div>
+      <div class="session-reflection" id="sessionDetailReflection"></div>
+      <div class="modal-actions">
+        <button class="modal-btn danger" id="deleteSessionBtn">刪除</button>
+        <button class="modal-btn secondary" id="closeDetailBtn">關閉</button>
       </div>
     </div>
   </div>
 
   <!-- 音效 -->
   <audio id="alarmSound" preload="auto">
-    <source
-      src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleRYVW6LR06FkFRpLltDcs3cvIDua0+CsaRsXQ5LP4LpxIxc3g8Pbs3sgHDGIzN63eSQaLYDG2rpzIBkrisrduXMlHi+DyNu2cCMZLYjJ3bdyJBwwg8nbtnAjGi2Iyd23ciQcMIPJ27ZwIxothsndt3IkHDCDydu2cCMaLYbJ3bdyJBwwg8nbtnAjGi2Gyd23ciQcMIPJ27ZwIxothsndt3IkHDCDydu2cCMaLYbJ3bdyJBwwg8nbtnAjGi2Gyd23ciQcMIPJ27ZwIxothsndt3IkHDCDydu2cCMaLYbJ3bdyJBwwg8nbtnAjGi2Gyd23ciQcMIPJ27ZwIxothsndt3IkHDCDydu2cCMaLYbJ3bdyJBwwg8nbtnAjGi2Gyd23ciQcMA=="
-      type="audio/wav">
+    <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleRYVW6LR06FkFRpLltDcs3cvIDua0+CsaRsXQ5LP4LpxIxc3g8Pbs3sgHDGIzN63eSQaLYDG2rpzIBkrisrduXMlHi+DyNu2cCMZLYjJ3bdyJBwwg8nbtnAjGi2Iyd23ciQcMIPJ27ZwIxothsndt3IkHDCDydu2cCMaLYbJ3bdyJBwwg8nbtnAjGi2Gyd23ciQcMIPJ27ZwIxothsndt3IkHDCDydu2cCMaLYbJ3bdyJBwwg8nbtnAjGi2Gyd23ciQcMIPJ27ZwIxothsndt3IkHDCDydu2cCMaLYbJ3bdyJBwwg8nbtnAjGi2Gyd23ciQcMIPJ27ZwIxothsndt3IkHDCDydu2cCMaLYbJ3bdyJBwwg8nbtnAjGi2Gyd23ciQcMA==" type="audio/wav">
   </audio>
 
   <script>
     // ============ 密碼保護 ============
     const AUTH_PASSWORD = 'focus2025';  // ← 改成你要的密碼
     const AUTH_KEY = 'pomodoro_auth_token';
-
+    
     function checkAuth() {
       const savedToken = localStorage.getItem(AUTH_KEY);
       if (savedToken === generateToken()) {
@@ -1272,22 +1300,22 @@
       }
       return false;
     }
-
+    
     function generateToken() {
       // 簡單的裝置識別 token
       return btoa(AUTH_PASSWORD + navigator.userAgent.slice(0, 50));
     }
-
+    
     function unlockApp() {
       document.body.classList.remove('locked');
       document.getElementById('authOverlay').classList.add('hidden');
     }
-
+    
     function setupAuth() {
       const authInput = document.getElementById('authInput');
       const authBtn = document.getElementById('authBtn');
       const authError = document.getElementById('authError');
-
+      
       function tryAuth() {
         if (authInput.value === AUTH_PASSWORD) {
           localStorage.setItem(AUTH_KEY, generateToken());
@@ -1298,15 +1326,15 @@
           authInput.focus();
         }
       }
-
+      
       authBtn.addEventListener('click', tryAuth);
       authInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') tryAuth();
       });
-
+      
       authInput.focus();
     }
-
+    
     // 檢查是否已認證
     if (!checkAuth()) {
       setupAuth();
@@ -1351,6 +1379,10 @@
       statusDot: document.getElementById('statusDot'),
       statusText: document.getElementById('statusText'),
       alarmSound: document.getElementById('alarmSound'),
+      // 放棄按鈕
+      abandonBtns: document.getElementById('abandonBtns'),
+      abandonWithTimeBtn: document.getElementById('abandonWithTimeBtn'),
+      abandonNoTimeBtn: document.getElementById('abandonNoTimeBtn'),
       // 開始 Modal
       startModal: document.getElementById('startModal'),
       startTaskInput: document.getElementById('startTaskInput'),
@@ -1365,19 +1397,28 @@
       modalStats: document.getElementById('modalStats'),
       reflectionInput: document.getElementById('reflectionInput'),
       confirmBtn: document.getElementById('confirmBtn'),
-      abandonBtn: document.getElementById('abandonBtn')
+      abandonBtn: document.getElementById('abandonBtn'),
+      // Session 詳細 Modal
+      sessionDetailModal: document.getElementById('sessionDetailModal'),
+      sessionDetailStats: document.getElementById('sessionDetailStats'),
+      sessionDetailReflection: document.getElementById('sessionDetailReflection'),
+      deleteSessionBtn: document.getElementById('deleteSessionBtn'),
+      closeDetailBtn: document.getElementById('closeDetailBtn')
     };
+
+    // 當前查看的 session index
+    let currentViewingSessionIndex = null;
 
     // ============ 初始化 ============
     function init() {
       generateClockMarks();
       setupEventListeners();
       updateClockDisplay();
-
+      
       renderWeekView();
       renderTimeline();
       updateConnectionStatus();
-
+      
       if (state.sheetUrl) {
         elements.sheetUrl.value = state.sheetUrl;
         loadSessionsFromSheet();
@@ -1413,7 +1454,7 @@
           state.duration = parseInt(btn.dataset.minutes);
           state.timeLeft = state.duration * 60;
           updateClockDisplay();
-
+          
         });
       });
 
@@ -1443,8 +1484,8 @@
       elements.saveSettings.addEventListener('click', saveSettings);
 
       document.addEventListener('click', (e) => {
-        if (!elements.settingsPanel.contains(e.target) &&
-          !elements.settingsToggle.contains(e.target)) {
+        if (!elements.settingsPanel.contains(e.target) && 
+            !elements.settingsToggle.contains(e.target)) {
           elements.settingsPanel.classList.remove('show');
         }
       });
@@ -1500,7 +1541,27 @@
       });
 
       elements.abandonBtn.addEventListener('click', () => {
-        completeSession(true);
+        elements.reflectionModal.classList.remove('show');
+      });
+
+      // 首頁放棄按鈕
+      elements.abandonWithTimeBtn.addEventListener('click', () => {
+        abandonSession(true);  // 計時
+      });
+
+      elements.abandonNoTimeBtn.addEventListener('click', () => {
+        abandonSession(false);  // 不計時
+      });
+
+      // Session 詳細 Modal 事件
+      elements.closeDetailBtn.addEventListener('click', () => {
+        elements.sessionDetailModal.classList.remove('show');
+      });
+
+      elements.deleteSessionBtn.addEventListener('click', () => {
+        if (currentViewingSessionIndex !== null) {
+          deleteSession(currentViewingSessionIndex);
+        }
       });
     }
 
@@ -1510,7 +1571,8 @@
         // 超時狀態下按按鈕 = 確認結束
         confirmComplete();
       } else if (state.isRunning) {
-        stopTimer(false);
+        // 運行中按停止，不做任何事（用下方放棄按鈕）
+        return;
       } else {
         showStartModal();
       }
@@ -1519,15 +1581,15 @@
     function showStartModal() {
       // 同步當前設定到 Modal
       elements.startTaskInput.value = elements.taskInput.value;
-
+      
       // 同步 Tier
       document.querySelectorAll('.modal-tier-btn').forEach(b => b.classList.remove('active'));
       document.querySelector(`.modal-tier-btn[data-tier="${state.selectedTier}"]`).classList.add('active');
-
+      
       // 同步時長
       document.querySelectorAll('.modal-duration-btn').forEach(b => b.classList.remove('active'));
       document.querySelector(`.modal-duration-btn[data-minutes="${state.duration}"]`).classList.add('active');
-
+      
       elements.startModal.classList.add('show');
       elements.startTaskInput.focus();
     }
@@ -1541,9 +1603,13 @@
       state.overtime = 0;
       state.timeLeft = state.duration * 60;
 
-      elements.startBtn.textContent = '停止 SESSION';
+      elements.startBtn.textContent = '專注中...';
       elements.startBtn.classList.add('running');
       elements.startBtn.classList.remove('overtime');
+      elements.startBtn.style.pointerEvents = 'none';  // 禁用開始按鈕
+
+      // 顯示放棄按鈕
+      elements.abandonBtns.classList.add('show');
 
       updateTimeRange();
       updateClockTierColor();
@@ -1551,7 +1617,7 @@
       // 使用時間差計算，避免背景 throttle 問題
       state.intervalId = setInterval(() => {
         const now = new Date();
-
+        
         if (state.isOvertime) {
           // 超時模式：計算從 endTime 到現在經過多久
           state.overtime = Math.floor((now - state.endTime) / 1000);
@@ -1575,20 +1641,65 @@
       state.overtime = 0;
       playAlarm();
       showTimeUpModal();
-
+      
       // 更新按鈕為「確認完成」
       elements.startBtn.textContent = '確認完成';
       elements.startBtn.classList.remove('running');
       elements.startBtn.classList.add('overtime');
-
+      elements.startBtn.style.pointerEvents = 'auto';  // 啟用確認按鈕
+      
+      // 隱藏放棄按鈕
+      elements.abandonBtns.classList.remove('show');
+      
       // 時鐘指針停在終點
       elements.clockHand.style.transform = 'rotate(360deg)';
+    }
+
+    // 放棄 session
+    function abandonSession(countTime) {
+      clearInterval(state.intervalId);
+      state.actualEndTime = new Date();
+      
+      // 計算已花費時間
+      const elapsedSeconds = Math.floor((state.actualEndTime - state.startTime) / 1000);
+      state.elapsedMinutes = Math.floor(elapsedSeconds / 60);
+      
+      if (countTime && state.elapsedMinutes > 0) {
+        // 計時：儲存 session
+        const session = {
+          task: elements.taskInput.value || '專注',
+          tier: state.selectedTier,
+          duration: state.elapsedMinutes,
+          plannedDuration: state.duration,
+          overtime: 0,
+          startTime: state.startTime.toISOString(),
+          endTime: state.actualEndTime.toISOString(),
+          reflection: '',
+          abandoned: true,
+          completed: false
+        };
+        
+        state.sessions.push(session);
+        localStorage.setItem('sessions', JSON.stringify(state.sessions));
+        
+        if (state.sheetUrl) {
+          syncToSheet(session);
+        }
+        
+        renderWeekView();
+        renderTimeline();
+      }
+      
+      // 重置 UI
+      state.isRunning = false;
+      state.isOvertime = false;
+      resetTimerUI();
     }
 
     function showTimeUpModal() {
       elements.timeUpTask.textContent = elements.taskInput.value || '專注時段';
       elements.timeUpModal.classList.add('show');
-
+      
       // 也發送系統通知
       if ('Notification' in window && Notification.permission === 'granted') {
         const notification = new Notification('時間到！', {
@@ -1606,7 +1717,7 @@
     function confirmComplete() {
       // 關閉時間到 modal（如果開著）
       elements.timeUpModal.classList.remove('show');
-
+      
       // 停止計時，顯示反思 modal
       clearInterval(state.intervalId);
       state.actualEndTime = new Date();
@@ -1615,10 +1726,10 @@
 
     function showReflectionModal() {
       state.isAbandoned = false;
-
+      
       // 計算實際時長
       const actualMinutes = state.duration + Math.floor(state.overtime / 60);
-
+      
       // 顯示統計
       let statsHtml = `
         <div class="stat-row">
@@ -1630,7 +1741,7 @@
           <span class="stat-value">${state.duration} 分鐘</span>
         </div>
       `;
-
+      
       if (state.overtime > 0) {
         const overtimeMin = Math.floor(state.overtime / 60);
         const overtimeSec = state.overtime % 60;
@@ -1641,19 +1752,19 @@
           </div>
         `;
       }
-
+      
       statsHtml += `
         <div class="stat-row">
           <span class="stat-label">實際時長</span>
           <span class="stat-value">${actualMinutes} 分鐘</span>
         </div>
       `;
-
+      
       // 重置 modal 標題和按鈕
       document.querySelector('#reflectionModal .modal-title').textContent = 'Session 完成';
       elements.abandonBtn.textContent = '放棄（仍計時間）';
       elements.confirmBtn.textContent = '完成 Session';
-
+      
       elements.modalStats.innerHTML = statsHtml;
       elements.reflectionInput.value = '';
       elements.reflectionModal.classList.add('show');
@@ -1662,74 +1773,34 @@
     function completeSession(abandoned) {
       state.isRunning = false;
       state.isOvertime = false;
-
+      
       // 判斷是否為中途放棄
       const isEarlyStop = state.isAbandoned;
-
+      
       if (abandoned && isEarlyStop) {
         // 中途放棄且選擇不計時間
         elements.reflectionModal.classList.remove('show');
         resetTimerUI();
         return;
       }
-
+      
       // 儲存 session（計入時間）
       saveSession(abandoned, isEarlyStop);
-
+      
       // 關閉 modal
       elements.reflectionModal.classList.remove('show');
-
+      
       // 重置 UI
       resetTimerUI();
-    }
-
-    function stopTimer() {
-      // 中途停止，計算已經花費的時間
-      clearInterval(state.intervalId);
-      state.actualEndTime = new Date();
-      state.isAbandoned = true;
-
-      // 計算已花費時間（秒）
-      const elapsedSeconds = Math.floor((state.actualEndTime - state.startTime) / 1000);
-      state.elapsedMinutes = Math.floor(elapsedSeconds / 60);
-
-      // 顯示放棄確認 modal
-      showAbandonModal();
-    }
-
-    function showAbandonModal() {
-      const elapsedMin = state.elapsedMinutes;
-      const elapsedSec = Math.floor((state.actualEndTime - state.startTime) / 1000) % 60;
-
-      let statsHtml = `
-        <div class="stat-row">
-          <span class="stat-label">任務</span>
-          <span class="stat-value">${elements.taskInput.value || '專注'}</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">原定時長</span>
-          <span class="stat-value">${state.duration} 分鐘</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label">已專注</span>
-          <span class="stat-value">${elapsedMin}:${elapsedSec.toString().padStart(2, '0')}</span>
-        </div>
-      `;
-
-      elements.modalStats.innerHTML = statsHtml;
-      elements.reflectionInput.value = '';
-
-      // 更新 modal 標題和按鈕
-      document.querySelector('#reflectionModal .modal-title').textContent = '中途結束';
-      elements.abandonBtn.textContent = '不計時間';
-      elements.confirmBtn.textContent = '計入時間';
-
-      elements.reflectionModal.classList.add('show');
     }
 
     function resetTimerUI() {
       elements.startBtn.textContent = '開始 SESSION';
       elements.startBtn.classList.remove('running', 'overtime');
+      elements.startBtn.style.pointerEvents = 'auto';
+
+      // 隱藏放棄按鈕
+      elements.abandonBtns.classList.remove('show');
 
       state.timeLeft = state.duration * 60;
       state.overtime = 0;
@@ -1740,8 +1811,8 @@
 
     function playAlarm() {
       elements.alarmSound.currentTime = 0;
-      elements.alarmSound.play().catch(() => { });
-
+      elements.alarmSound.play().catch(() => {});
+      
       if ('Notification' in window && Notification.permission === 'granted') {
         new Notification('專注時間結束！', {
           body: elements.taskInput.value || '休息一下吧'
@@ -1762,14 +1833,14 @@
         // 超時模式：顯示 +MM:SS
         const minutes = Math.floor(state.overtime / 60);
         const seconds = state.overtime % 60;
-        elements.timeDisplay.textContent =
+        elements.timeDisplay.textContent = 
           `+${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         elements.timeDisplay.classList.add('overtime');
       } else {
         // 正常模式：顯示倒數
         const minutes = Math.floor(state.timeLeft / 60);
         const seconds = state.timeLeft % 60;
-        elements.timeDisplay.textContent =
+        elements.timeDisplay.textContent = 
           `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         elements.timeDisplay.classList.remove('overtime');
       }
@@ -1794,19 +1865,19 @@
       const startOfWeek = new Date(today);
       startOfWeek.setDate(today.getDate() - today.getDay() + 1 + state.weekOffset * 7);
 
-      const days = [ '週一', '週二', '週三', '週四', '週五', '週六', '週日' ];
+      const days = ['週一', '週二', '週三', '週四', '週五', '週六', '週日'];
       let html = '';
 
       for (let i = 0; i < 7; i++) {
         const date = new Date(startOfWeek);
         date.setDate(startOfWeek.getDate() + i);
-
+        
         const isActive = isSameDay(date, state.selectedDate);
         const dayHours = getDayTotalMinutes(date);
 
         html += `
           <div class="day-column ${isActive ? 'active' : ''}" data-date="${date.toISOString()}">
-            <div class="day-label">${days[ i ]}</div>
+            <div class="day-label">${days[i]}</div>
             <div class="day-number">${date.getDate()}</div>
             <div class="day-hours">${dayHours > 0 ? (dayHours / 60).toFixed(2) : '0.00'}</div>
           </div>
@@ -1826,8 +1897,8 @@
 
     function isSameDay(d1, d2) {
       return d1.getFullYear() === d2.getFullYear() &&
-        d1.getMonth() === d2.getMonth() &&
-        d1.getDate() === d2.getDate();
+             d1.getMonth() === d2.getMonth() &&
+             d1.getDate() === d2.getDate();
     }
 
     function getDayTotalMinutes(date) {
@@ -1838,7 +1909,7 @@
 
     // ============ 時間軸 ============
     function renderTimeline() {
-      const daySessions = state.sessions.filter(s =>
+      const daySessions = state.sessions.filter(s => 
         isSameDay(new Date(s.startTime), state.selectedDate)
       );
 
@@ -1857,7 +1928,7 @@
         const start = new Date(session.startTime);
         const hour = start.getHours();
         const minute = start.getMinutes();
-
+        
         if (hour < 6 || hour > 23) return;
 
         const slot = document.getElementById(`slot-${hour}`);
@@ -1869,6 +1940,7 @@
         const block = document.createElement('div');
         block.className = 'focus-block';
         block.dataset.tier = session.tier;
+        block.dataset.index = state.sessions.indexOf(session);
         block.style.top = `${topOffset}px`;
         block.style.height = `${Math.max(height, 40)}px`;
         block.innerHTML = `
@@ -1877,6 +1949,12 @@
           <div class="block-tier">Tier ${session.tier}</div>
           <div class="block-duration">${session.duration}min</div>
         `;
+        
+        // 點擊顯示詳細資料
+        block.addEventListener('click', () => {
+          showSessionDetail(parseInt(block.dataset.index));
+        });
+        
         slot.appendChild(block);
       });
 
@@ -1891,6 +1969,66 @@
       elements.statsSummary.innerHTML = `<span class="stats-text">今日專注 <strong>${timeStr}</strong></span>`;
     }
 
+    // 顯示 Session 詳細資料
+    function showSessionDetail(index) {
+      const session = state.sessions[index];
+      if (!session) return;
+      
+      currentViewingSessionIndex = index;
+      
+      const start = new Date(session.startTime);
+      const weekdays = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
+      const dateStr = `${start.getMonth() + 1}/${start.getDate()} ${weekdays[start.getDay()]}`;
+      const timeStr = formatTime(start);
+      
+      let statsHtml = `
+        <div class="stat-row">
+          <span class="stat-label">日期</span>
+          <span class="stat-value">${dateStr}</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">時間</span>
+          <span class="stat-value">${timeStr}</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">任務</span>
+          <span class="stat-value">${session.task || '專注'}</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Tier</span>
+          <span class="stat-value">Tier ${session.tier}</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">時長</span>
+          <span class="stat-value">${session.duration} 分鐘</span>
+        </div>
+      `;
+      
+      if (session.abandoned) {
+        statsHtml += `
+          <div class="stat-row">
+            <span class="stat-label">狀態</span>
+            <span class="stat-value" style="color: var(--tier1-color)">已放棄</span>
+          </div>
+        `;
+      }
+      
+      elements.sessionDetailStats.innerHTML = statsHtml;
+      elements.sessionDetailReflection.textContent = session.reflection || '';
+      elements.sessionDetailModal.classList.add('show');
+    }
+
+    // 刪除 Session
+    function deleteSession(index) {
+      if (confirm('確定要刪除這個 Session 嗎？')) {
+        state.sessions.splice(index, 1);
+        localStorage.setItem('sessions', JSON.stringify(state.sessions));
+        elements.sessionDetailModal.classList.remove('show');
+        renderWeekView();
+        renderTimeline();
+      }
+    }
+
     function showCurrentTimeLine() {
       const now = new Date();
       const hour = now.getHours();
@@ -1902,13 +2040,13 @@
       if (!slot) return;
 
       const topOffset = (minute / 60) * 60;
-
+      
       const line = document.createElement('div');
       line.className = 'current-time-line';
       line.style.display = 'block';
       line.style.top = `${topOffset}px`;
       line.innerHTML = `<span class="current-time-indicator">${formatTime(now)}</span>`;
-
+      
       slot.querySelector('.slot-content').appendChild(line);
     }
 
@@ -1920,7 +2058,7 @@
     function saveSession(abandoned = false, isEarlyStop = false) {
       const actualEnd = state.actualEndTime || new Date();
       const reflection = elements.reflectionInput ? elements.reflectionInput.value.trim() : '';
-
+      
       // 計算實際時長
       let actualDuration;
       if (isEarlyStop) {
@@ -1930,7 +2068,7 @@
         // 正常完成或超時：原定時長 + 超時
         actualDuration = state.duration + Math.floor(state.overtime / 60);
       }
-
+      
       const session = {
         task: elements.taskInput.value || '專注',
         tier: state.selectedTier,
@@ -1946,7 +2084,7 @@
 
       state.sessions.push(session);
       localStorage.setItem('sessions', JSON.stringify(state.sessions));
-
+      
       if (state.sheetUrl) {
         syncToSheet(session);
       }
@@ -1960,7 +2098,7 @@
       state.sheetUrl = elements.sheetUrl.value.trim();
       localStorage.setItem('sheetUrl', state.sheetUrl);
       updateConnectionStatus();
-
+      
       if (state.sheetUrl) {
         testConnection();
       }
@@ -2018,38 +2156,38 @@
 
       try {
         elements.statusText.textContent = '同步中...';
-
+        
         const response = await fetch(`${state.sheetUrl}?_=${Date.now()}`);
         if (response.ok) {
           const data = await response.json();
-
+          
           // 簡化格式：日期, 任務, Tier, 時長(分), 反思
           if (Array.isArray(data) && data.length > 1) {
             const sheetSessions = data.slice(1).map(row => {
               // 解析日期 "1/26 週日" 格式
-              const dateStr = row[ 0 ] || '';
+              const dateStr = row[0] || '';
               const startTime = parseDateString(dateStr);
-
+              
               return {
-                task: row[ 1 ] || '專注',
-                tier: parseInt(row[ 2 ]) || 2,
-                duration: parseInt(row[ 3 ]) || 25,
+                task: row[1] || '專注',
+                tier: parseInt(row[2]) || 2,
+                duration: parseInt(row[3]) || 25,
                 startTime: startTime,
-                reflection: row[ 4 ] || '',
+                reflection: row[4] || '',
                 completed: true
               };
             }).filter(s => s.startTime);
-
+            
             // 合併：以 startTime 為 key 去重
             const existingKeys = new Set(state.sessions.map(s => s.startTime));
             const newSessions = sheetSessions.filter(s => !existingKeys.has(s.startTime));
-
+            
             if (newSessions.length > 0) {
-              state.sessions = [ ...state.sessions, ...newSessions ];
+              state.sessions = [...state.sessions, ...newSessions];
               state.sessions.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
               localStorage.setItem('sessions', JSON.stringify(state.sessions));
             }
-
+            
             renderWeekView();
             renderTimeline();
             elements.statusText.textContent = `已同步 (${sheetSessions.length} 筆)`;
@@ -2074,8 +2212,8 @@
         // 提取 M/D
         const match = dateStr.match(/(\d{1,2})\/(\d{1,2})/);
         if (match) {
-          const month = parseInt(match[ 1 ]);
-          const day = parseInt(match[ 2 ]);
+          const month = parseInt(match[1]);
+          const day = parseInt(match[2]);
           const year = new Date().getFullYear();
           // 建立日期（預設當年）
           const date = new Date(year, month - 1, day, 12, 0, 0);
@@ -2094,5 +2232,4 @@
     init();
   </script>
 </body>
-
 </html>
